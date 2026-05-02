@@ -975,13 +975,15 @@ end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False
 	functionsloaded = true
 if not PQR_StatusOverlayLib then
 	PQR_StatusOverlayLib = true
+	if PQR_OverlayBuffEnabled == nil then PQR_OverlayBuffEnabled = false end
 	function PQR_CreateStatusOverlay()
 		if PQR_StatusOverlayFrame then return end
 		local f = CreateFrame(&quot;Frame&quot;, &quot;PQR_StatusOverlayFrame&quot;, UIParent)
 		PQR_StatusOverlayFrame = f
-		f:SetWidth(240)
-		f:SetHeight(76)
+		f:SetWidth(280)
+		f:SetHeight(138)
 		f:SetPoint(&quot;TOP&quot;, UIParent, &quot;TOP&quot;, 0, -28)
+		f:SetFrameStrata(&quot;MEDIUM&quot;)
 		local bg = f:CreateTexture(nil, &quot;BACKGROUND&quot;)
 		bg:SetAllPoints()
 		bg:SetTexture(0, 0, 0, 0.55)
@@ -1003,6 +1005,35 @@ if not PQR_StatusOverlayLib then
 		l3:SetPoint(&quot;TOPLEFT&quot;, f, &quot;TOPLEFT&quot;, 8, -54)
 		l3:SetJustifyH(&quot;LEFT&quot;)
 		PQR_StatusOverlayLine3 = l3
+		local cbR = CreateFrame(&quot;CheckButton&quot;, &quot;PQR_StatusOverlay_cbRot&quot;, f, &quot;UICheckButtonTemplate&quot;)
+		cbR:SetPoint(&quot;TOPLEFT&quot;, f, &quot;TOPLEFT&quot;, 4, -68)
+		cbR:SetScript(&quot;OnClick&quot;, function(self)
+			StopRota = not self:GetChecked()
+		end)
+		_G[cbR:GetName()..&quot;Text&quot;]:SetText(&quot;Rotation enabled&quot;)
+		PQR_StatusOverlay_cbRot = cbR
+		local cbA = CreateFrame(&quot;CheckButton&quot;, &quot;PQR_StatusOverlay_cbAoE&quot;, f, &quot;UICheckButtonTemplate&quot;)
+		cbA:SetPoint(&quot;TOPLEFT&quot;, f, &quot;TOPLEFT&quot;, 4, -88)
+		cbA:SetScript(&quot;OnClick&quot;, function(self)
+			if AoE ~= nil then AoE = self:GetChecked() end
+		end)
+		_G[cbA:GetName()..&quot;Text&quot;]:SetText(&quot;AoE mode&quot;)
+		PQR_StatusOverlay_cbAoE = cbA
+		local cbB = CreateFrame(&quot;CheckButton&quot;, &quot;PQR_StatusOverlay_cbBuff&quot;, f, &quot;UICheckButtonTemplate&quot;)
+		cbB:SetPoint(&quot;TOPLEFT&quot;, f, &quot;TOPLEFT&quot;, 4, -108)
+		cbB:SetScript(&quot;OnClick&quot;, function(self)
+			PQR_OverlayBuffEnabled = self:GetChecked()
+		end)
+		_G[cbB:GetName()..&quot;Text&quot;]:SetText(&quot;Extra toggle (profile hook)&quot;)
+		PQR_StatusOverlay_cbBuff = cbB
+		PQR_OverlayHUD_Accum = 0
+		f:SetScript(&quot;OnUpdate&quot;, function(self, elapsed)
+			PQR_OverlayHUD_Accum = PQR_OverlayHUD_Accum + elapsed
+			if PQR_OverlayHUD_Accum &gt;= 0.15 then
+				PQR_OverlayHUD_Accum = 0
+				if PQR_UpdateStatusOverlay then PQR_UpdateStatusOverlay() end
+			end
+		end)
 	end
 	function PQR_UpdateStatusOverlay()
 		if not PQR_StatusOverlayFrame then PQR_CreateStatusOverlay() end
@@ -1049,6 +1080,20 @@ if not PQR_StatusOverlayLib then
 		end
 		local extra = (#parts &gt; 0) and table.concat(parts, &quot;  |  &quot;) or &quot; &quot;
 		PQR_StatusOverlayLine3:SetText(extra)
+		if PQR_StatusOverlay_cbRot then
+			PQR_StatusOverlay_cbRot:SetChecked(StopRota ~= true)
+		end
+		if PQR_StatusOverlay_cbAoE then
+			if AoE ~= nil then
+				PQR_StatusOverlay_cbAoE:Show()
+				PQR_StatusOverlay_cbAoE:SetChecked(AoE == true)
+			else
+				PQR_StatusOverlay_cbAoE:Hide()
+			end
+		end
+		if PQR_StatusOverlay_cbBuff then
+			PQR_StatusOverlay_cbBuff:SetChecked(PQR_OverlayBuffEnabled == true)
+		end
 	end
 end
 end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><LuaBefore></LuaBefore><LuaAfter></LuaAfter></Ability><Ability><Name>-- All:Racial --</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>local debuff = { 6215, 8122, 5484, 2637, 5246, 6358 }
