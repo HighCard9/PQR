@@ -669,12 +669,11 @@ if SSH ~= nil then
 else
     return true
 end</Lua><RecastDelay>0</RecastDelay><Target>Player</Target><CancelChannel>False</CancelChannel><LuaBefore></LuaBefore><LuaAfter></LuaAfter></Ability><Ability><Name>R:Divine Plea</Name><Default>false</Default><SpellID>54428</SpellID><Actions></Actions><Lua>if not CanAttack() then return false end
+if dplea then return false end
+if CooldownRemains(54428) then return false end
 local mana = getMana(&amp;quot;player&amp;quot;)
 if mana &amp;gt;= 50 then return false end
-if PQR_RetDivinePleaLowMana == true then
-	if mana &amp;gt;= 30 then return false end
-	if UnitBuffID(&amp;quot;player&amp;quot;, 54428) then return false end
-end
+if PQR_RetDivinePleaLowMana == true and mana &amp;gt;= 30 then return false end
 return true end</Lua><RecastDelay>0</RecastDelay><Target>Player</Target><CancelChannel>False</CancelChannel><LuaBefore></LuaBefore><LuaAfter></LuaAfter></Ability><Ability><Name>R:Divine Storm</Name><Default>false</Default><SpellID>53385</SpellID><Actions></Actions><Lua>if CanAttack()
 and rangeCheck(35395, &amp;quot;target&amp;quot;)
 and not CooldownRemains(53385)
